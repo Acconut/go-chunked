@@ -15,6 +15,7 @@ func TestCreateDatabase(t *testing.T) {
 
     config := DefaultConfig
     config.Blocksize = 32
+    config.Chunksize = 30
     db, err := Create("./test-db", config)
     if err != nil {
         t.Fatal(err)

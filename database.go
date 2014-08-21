@@ -15,7 +15,7 @@ type Config struct {
     // Maximum size of a block in bytes
     Blocksize uint
     // Maximum number of blocks in a chunk file
-    Rotation uint
+    Chunksize uint
     // Internal representation of the next free block (don't use)
     NextBlock uint
 
@@ -24,7 +24,7 @@ type Config struct {
 // Default configuration used to create a new database.
 var DefaultConfig = &Config{
     Blocksize: 100,
-    Rotation: 10000,
+    Chunksize: 10000,
 }
 
 type Database struct {
@@ -204,11 +204,12 @@ func (db *Database) getFreeBlockPosition() uint {
 
 func (db *Database) readBlock(pos uint) (*Block, error) {
 
-    // Get blocksize
+    // Get blocksize and chunksize
+    cs := db.config.Chunksize
     bs := db.config.Blocksize
 
     // Get chunk to read from
-    chunkNum := int(math.Floor(float64(pos / bs)))
+    chunkNum := int(math.Floor(float64(pos / cs)))
 
     // Test if chunk exists
     if chunkNum >= len(db.chunks) {
@@ -240,11 +241,12 @@ func (db *Database) readBlock(pos uint) (*Block, error) {
 
 func (db *Database) writeBlock(pos uint, block *Block) error {
 
-    // Get blocksize
+    // Get blocksize and chunksize
+    cs := db.config.Chunksize
     bs := db.config.Blocksize
 
     // Get chunk to read from
-    chunkNum := int(math.Floor(float64(pos / bs)))
+    chunkNum := int(math.Floor(float64(pos / cs)))
     chunk := db.chunks[chunkNum]
 
     // Get offset
