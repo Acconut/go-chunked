@@ -46,7 +46,7 @@ func Create(dir string, config *Config) (*Database, error) {
     }
 
     // Create directory
-    err = os.MkdirAll(dir, os.ModeDir)
+    err = os.MkdirAll(dir, os.ModePerm)
     if err != nil {
         return nil, err
     }
