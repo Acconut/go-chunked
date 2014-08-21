@@ -1,4 +1,4 @@
-package block
+package chunked
 
 import (
     "testing"
@@ -15,7 +15,7 @@ func TestBlockConversion(t *testing.T) {
     
     bytes := b.Bytes(32)
     
-    block2, err := FromBytes(bytes)
+    block2, err := blockFromBytes(bytes)
     if err != nil {
         t.Fatal(err)
     }

@@ -1,4 +1,4 @@
-package block
+package chunked
 
 import (
     "bytes"
@@ -33,7 +33,7 @@ func (b *Block) Bytes(blocksize uint) ([]byte) {
 
 }
 
-func FromBytes(buf []byte) (*Block, error) {
+func blockFromBytes(buf []byte) (*Block, error) {
 
     var block Block
     reader := bytes.NewReader(buf)

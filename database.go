@@ -9,8 +9,6 @@ import (
     "regexp"
     "math"
     "bytes"
-
-    "github.com/Acconut/go-chunked/block"
 )
 
 type Config struct {
@@ -167,7 +165,7 @@ func (db *Database) Append(data []byte) (uint, error) {
         }
 
         dat := data[startPos:endPos]
-        block := &block.Block{
+        block := &Block{
             Type: int8(typ),
             Length: uint64(len(dat)),
             Data: dat,
@@ -196,7 +194,7 @@ func (db *Database) getFreeBlockPosition() uint {
 
 }
 
-func (db *Database) readBlock(pos uint) (*block.Block, error) {
+func (db *Database) readBlock(pos uint) (*Block, error) {
 
     // Get blocksize
     bs := db.config.Blocksize
@@ -216,7 +214,7 @@ func (db *Database) readBlock(pos uint) (*block.Block, error) {
         return nil, err
     }
 
-    block, err := block.FromBytes(buf)
+    block, err := blockFromBytes(buf)
     if err != nil {
         return nil, err
     }
@@ -224,7 +222,7 @@ func (db *Database) readBlock(pos uint) (*block.Block, error) {
     return block, nil
 }
 
-func (db *Database) writeBlock(pos uint, block *block.Block) error {
+func (db *Database) writeBlock(pos uint, block *Block) error {
 
     // Get blocksize
     bs := db.config.Blocksize
