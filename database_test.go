@@ -3,7 +3,6 @@ package chunked
 import (
     "testing"
     "os"
-    "fmt"
 )
 
 func TestCreateDatabase(t *testing.T) {
@@ -98,7 +97,7 @@ func TestBigAppendAndRead(t *testing.T) {
     if err != nil {
         t.Fatal(err)
     }
-fmt.Println(key)
+
     if key != 1 {
         t.Fatal("wrong key")
     }
@@ -107,8 +106,6 @@ fmt.Println(key)
     if err != nil {
         t.Fatal(err)
     }
-    
-    fmt.Println(string(value))
 
     if string(value) != "a strign bigger then the blocksize foo bar lol" {
         t.Fatal("wrong value")

@@ -8,7 +8,6 @@ import (
     "io/ioutil"
     "regexp"
     "math"
-    _ "fmt"
     "bytes"
 
     "github.com/Acconut/go-chunked/block"
