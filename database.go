@@ -209,7 +209,7 @@ func (db *Database) readBlock(pos uint) (*Block, error) {
 
     // Get chunk to read from
     chunkNum := int(math.Floor(float64(pos / bs)))
-    
+
     // Test if chunk exists
     if chunkNum >= len(db.chunks) {
         return nil, errors.New("key not found")
@@ -320,4 +320,19 @@ func (db *Database) Close() error {
     }
 
     return nil
+}
+
+// Remove a value and key from the database
+func (db *Database) Delete(key uint) error {
+
+    block := &Block{
+        Type: int8(0),
+        Length: 0,
+        Data: []byte{},
+        NextBlock: -1,
+    }
+
+    err := db.writeBlock(key, block)
+
+    return err
 }
