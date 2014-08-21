@@ -52,5 +52,13 @@ func main() {
 }
 ```
 
+# Interals
+
+Chunked splites your values into pieces so that each one of them fits into an array with the length defined in `Blocksize`.
+If you have a blocksize of 10 and a value with the length of 22 then you're going to have three blocks: Two with length of 10 and one of 2.
+The first block contains a reference to the second and the second block to the thrid one. So you can start reading all of them just from knowing the position of the first one.
+The maximum number of blocks in a chunk-file is defined using `Chunksize`. Using a chunksize of 20, the first 20 blocks are stored in the first chunk-file.
+21st to 40th block can be found in the second file and so on.
+
 # License
 MIT
