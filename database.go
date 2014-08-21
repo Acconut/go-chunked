@@ -209,6 +209,11 @@ func (db *Database) readBlock(pos uint) (*Block, error) {
 
     // Get chunk to read from
     chunkNum := int(math.Floor(float64(pos / bs)))
+    
+    // Test if chunk exists
+    if chunkNum >= len(db.chunks) {
+        return nil, errors.New("key not found")
+    }
     chunk := db.chunks[chunkNum]
 
     // Get offset
@@ -219,6 +224,9 @@ func (db *Database) readBlock(pos uint) (*Block, error) {
     _, err := chunk.ReadAt(buf, offset)
 
     if err != nil {
+        if err.Error() == "EOF" {
+            return nil, errors.New("key not found")
+        }
         return nil, err
     }
 
@@ -252,6 +260,7 @@ func (db *Database) Read(key uint) ([]byte, error) {
 
     buf := new(bytes.Buffer)
     pos := key
+    firstBlock := true
 
     for {
 
@@ -259,9 +268,14 @@ func (db *Database) Read(key uint) ([]byte, error) {
         if err != nil {
             return nil, err
         }
-        
+
+        if firstBlock && block.Type != 1 {
+            return nil, errors.New("key not found")
+        }
+        firstBlock = false
+
         buf.Write(block.Data)
-        
+
         if block.NextBlock != -1 {
             pos = uint(block.NextBlock)
         } else {

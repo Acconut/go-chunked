@@ -110,6 +110,33 @@ func TestBigAppendAndRead(t *testing.T) {
     if string(value) != "a strign bigger then the blocksize foo bar lol" {
         t.Fatal("wrong value")
     }
+    
+    // Reading continuation block
+    value, err = db.Read(key + 1)
+    if value != nil {
+        t.Fatal("value should not be presented");
+    }
+    if err.Error() != "key not found" {
+        t.Fatal("key shouldn't be found")
+    }
+    
+    // Reading key bigger than blocksize
+    value, err = db.Read(99)
+    if value != nil {
+        t.Fatal("value should not be presented");
+    }
+    if err.Error() != "key not found" {
+        t.Fatal("key shouldn't be found")
+    }
+    
+    value, err = db.Read(20)
+    if value != nil {
+        t.Fatal("value should not be presented");
+    }
+    if err.Error() != "key not found" {
+        t.Fatal("key shouldn't be found")
+    }
+    
     if err = db.Close(); err != nil {
         t.Fatal(err)
     }
