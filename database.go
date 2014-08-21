@@ -16,6 +16,7 @@ type Config struct {
     Blocksize uint
     // Maximum number of blocks in a chunk file
     Rotation uint
+    // Internal representation of the next free block (don't use)
     NextBlock uint
 
 }
