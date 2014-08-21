@@ -12,13 +12,15 @@ import (
 )
 
 type Config struct {
-
+    // Maximum size of a block in bytes
     Blocksize uint
+    // Maximum number of blocks in a chunk file
     Rotation uint
     NextBlock uint
 
 }
 
+// Default configuration used to create a new database.
 var DefaultConfig = &Config{
     Blocksize: 100,
     Rotation: 10000,
@@ -34,6 +36,7 @@ type Database struct {
 
 var chunkFileNameRe = regexp.MustCompile(`^chunk\.(\d+)$`)
 
+// Creates a new database in the empty directory.
 func Create(dir string, config *Config) (*Database, error) {
 
     // Test whether directory exists already
@@ -77,6 +80,8 @@ func Create(dir string, config *Config) (*Database, error) {
 
 }
 
+// Opens a database from the specified directory.
+// No configuration is needed because it's stored on disk.
 func Open(dir string) (*Database, error) {
 
     // Read configuration
@@ -131,6 +136,8 @@ func getChunkFiles(dir string) ([]*os.File, error) {
     return files, nil
 }
 
+// Append the value to the database.
+// The first return value is the key which can be used to read it again.
 func (db *Database) Append(data []byte) (uint, error) {
 
     // Get blocksize
@@ -239,6 +246,7 @@ func (db *Database) writeBlock(pos uint, block *Block) error {
 
 }
 
+// Reads value from the database pointed to by the key.
 func (db *Database) Read(key uint) ([]byte, error) {
 
     buf := new(bytes.Buffer)
@@ -283,6 +291,8 @@ func (db *Database) saveConfig() error {
 
 }
 
+// Closes all open file descriptors to ensure no data is lost and saves the configuration.
+// Be sure to always close your database to avoid data corruption and loss.
 func (db *Database) Close() error {
     for _, v := range db.chunks {
         if err := v.Close(); err != nil {
