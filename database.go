@@ -9,6 +9,7 @@ import (
     "regexp"
     "math"
     "bytes"
+    "fmt"
 )
 
 type Config struct {
@@ -218,7 +219,7 @@ func (db *Database) readBlock(pos uint) (*Block, error) {
     chunk := db.chunks[chunkNum]
 
     // Get offset
-    offset := int64((pos % bs) * (1 + 8 + bs + 8))
+    offset := int64((pos % cs) * (1 + 8 + bs + 8))
 
     // Buffer to read into
     buf := make([]byte, 1 + 8 + bs + 8)
@@ -247,12 +248,16 @@ func (db *Database) writeBlock(pos uint, block *Block) error {
 
     // Get chunk to read from
     chunkNum := int(math.Floor(float64(pos / cs)))
-    chunk := db.chunks[chunkNum]
+
+    chunk, err := db.getOrCreateChunk(chunkNum)
+    if err != nil {
+        return err
+    }
 
     // Get offset
-    offset := int64((pos % bs) * (1 + 8 + bs + 8))
+    offset := int64((pos % cs) * (1 + 8 + bs + 8))
 
-    _, err := chunk.WriteAt(block.Bytes(bs), offset)
+    _, err = chunk.WriteAt(block.Bytes(bs), offset)
     return err
 
 }
@@ -337,4 +342,23 @@ func (db *Database) Delete(key uint) error {
     err := db.writeBlock(key, block)
 
     return err
+}
+
+func (db *Database) getOrCreateChunk(num int) (*os.File, error) {
+
+    if num < len(db.chunks) {
+        // Chunk exists already
+        return db.chunks[num], nil
+    }
+
+    // Create chunk file
+    file, err := os.Create(path.Join(db.dir, fmt.Sprintf("chunk.%d", num)))
+    if err != nil {
+        return nil, err
+    }
+
+    db.chunks = append(db.chunks, file)
+
+    return file, err
+
 }

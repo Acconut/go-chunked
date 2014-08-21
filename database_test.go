@@ -166,3 +166,33 @@ func TestDelete(t *testing.T) {
         t.Fatal(err)
     }
 }
+
+func TestChunkCreation(t *testing.T) {
+    db, err := Open("./test-db")
+    if err != nil {
+        t.Fatal(err)
+    }
+
+    for i := 0; i < 32; i++ {
+        _, err := db.Append([]byte{1,2,3})
+        if err != nil {
+            t.Fatal(err)
+        }
+    }
+
+    // It should be able to read from the second chunk file
+    keys := []int{29, 30, 31, 32, 33, 34}
+    for _, v := range keys {
+        value, err := db.Read(uint(v))
+        if err != nil {
+            t.Fatal(err)
+        }
+        if string(value) != string([]byte{1,2,3}) {
+            t.Fatal("wrong value for key %d", v)
+        }
+    }
+
+    if err = db.Close(); err != nil {
+        t.Fatal(err)
+    }
+}
